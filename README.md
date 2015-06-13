@@ -1,7 +1,7 @@
 <img src="http://www.cocos2d-x.org/attachments/801/cocos2dx_portrait.png" width=200>
 
 
-cocos2d-x
+cocos2d-x - my github.....hello world
 =========
 
 |  |iOS|Mac|Linux|Win32|Android|Win8.1-Universal|
