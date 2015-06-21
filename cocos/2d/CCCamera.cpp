@@ -33,6 +33,7 @@
 #include "renderer/CCGLProgramCache.h"
 #include "renderer/ccGLStateCache.h"
 #include "renderer/CCFrameBuffer.h"
+#include "renderer/CCRenderState.h"
 
 NS_CC_BEGIN
 
@@ -409,14 +410,16 @@ void Camera::clearBackground(float depth)
     {
         glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
         glStencilMask(0);
+
         oldDepthTest = glIsEnabled(GL_DEPTH_TEST);
         glGetIntegerv(GL_DEPTH_FUNC, &oldDepthFunc);
         glGetBooleanv(GL_DEPTH_WRITEMASK, &oldDepthMask);
+
         glDepthMask(GL_TRUE);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_ALWAYS);
     }
-    
+
     //draw
     static V3F_C4B_T2F_Quad quad;
     quad.bl.vertices = Vec3(-1,-1,0);
@@ -463,12 +466,21 @@ void Camera::clearBackground(float depth)
             glDisable(GL_DEPTH_TEST);
         }
         glDepthFunc(oldDepthFunc);
+
         if(GL_FALSE == oldDepthMask)
         {
             glDepthMask(GL_FALSE);
         }
-        
+
+        /* IMPORTANT: We only need to update the states that are not restored.
+         Since we don't know what was the previous value of the mask, we update the RenderState
+         after setting it.
+         The other values don't need to be updated since they were restored to their original values
+         */
         glStencilMask(0xFFFFF);
+        RenderState::StateBlock::_defaultState->setStencilWrite(0xFFFFF);
+
+        /* BUG: RenderState does not support glColorMask yet. */
         glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     }
 }
